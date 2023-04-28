@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>471 Final Project: Country Analysis</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+	<div style="position: absolute; left: 0px; top: 250px;" >		
+			<label for="categorySelect">Y Scale:</label>		
+			<select class="custom-select small" id="yScaleSelect" onchange="onYScaleChanged()"></select>				
+	</div>
+	<div style="position: absolute; left: 475px; bottom: 125px;">		
+		<label for="categorySelect">X Scale:</label>		
+		<select class="custom-select small" id="yScaleSelect" onchange="onXScaleChanged()"></select>
+	</div>
+	<div style="margin-left: 425px;">
+		<svg width="500" height="500" style="border: 1px solid #777;">
+		</svg>
+	</div>
+    
+</body>
+<script src="//d3js.org/d3.v5.min.js"></script>
+<script src="./d3-tip.js"></script>
+<script src="./main.js"></script>
+</html>
