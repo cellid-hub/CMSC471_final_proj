@@ -1,12 +1,26 @@
 //python -m http.server 8080
 var select = d3.selectAll('select');
 var chartScales;
+var svg = d3.select('svg');
+var domainMap;
+//var countries;
+var chartScales;
+var chartG = svg.append('g')
+    .attr('transform', 'translate('+[100, 100]+')');
+
+var xAxisG = chartG.append('g')
+    .attr('class', 'x axis')
+    .attr('transform', 'translate('+[-65, 375]+')');
+var yAxisG = chartG.append('g')
+    .attr('class', 'y axis')
+    .attr('transform', 'translate('+[-65, -130]+')');
+
 d3.csv('CLEANED_assignment_3_dataset.csv').then(function(countries) {
     //creating dropdown menus for X and Y axis
-    //exclude list: country, ISO Country code
+    //exclude list: country, ISO Country code    
     options = select.selectAll("option");
     options_enter = options.enter();
-    data_cols = dataset.columns
+    data_cols = countries.columns
     data_cols.shift(); //removes 'Country'
     data_cols.splice(12, 13); //removes 'Country Iso Code'    
     select.selectAll("option").data(data_cols).enter().append("option").each(
@@ -28,8 +42,8 @@ d3.csv('CLEANED_assignment_3_dataset.csv').then(function(countries) {
     });
 
     // Create global object called chartScales to keep state
-    chartScales = {x: 'economy (mpg)', y: 'power (hp)'};
-    updateChart();
+    chartScales = {x: 'Year', y: 'Year'};
+    updateChart(countries);
 
     })
 
@@ -51,39 +65,39 @@ function onYScaleChanged() {
     updateChart();
 }
 
-function updateChart() {
+function updateChart(countries) {
     // Update the scales based on new data attributes
+    var dots = chartG.selectAll('.dot').data(countries);    
     yScale.domain(domainMap[chartScales.y]).nice();
     xScale.domain(domainMap[chartScales.x]).nice();
 
     xAxisG.transition().duration(750).call(d3.axisBottom(xScale));
     yAxisG.transition().duration(750).call(d3.axisLeft(yScale));
 
-    var dots = chartG.selectAll('.dot').data(countries);
-
+    
     var dotsEnter = dots.enter()
-    .append('g')
-    .attr('class', 'dot')
-    .attr('transform', function(d) {
-        var tx = xScale(d[chartScales.x]);
-        var ty = yScale(d[chartScales.y]);
-        return 'translate('+[tx, ty]+')';
-    });
+        .append('g')
+        .attr('class', 'dot')
+        .attr('transform', function(d) {
+            var tx = xScale(d[chartScales.x]);
+            var ty = yScale(d[chartScales.y]);
+            return 'translate('+[tx, ty]+')';
+        });
     
     dotsEnter.append('circle').attr('r', 3);
 
     dots.merge(dotsEnter)
-    .transition()
-    .duration(750)
-    .attr('transform', function(d) {
-        var tx = xScale(d[chartScales.x]);
-        var ty = yScale(d[chartScales.y]);
-        return 'translate('+[tx, ty]+')';
-    });
+        .transition()
+        .duration(750)
+        .attr('transform', function(d) {
+            var tx = xScale(d[chartScales.x]);
+            var ty = yScale(d[chartScales.y]);
+            return 'translate('+[tx-190, ty]+')';
+        });
 
-    dotsEnter.append('text')
+    /*dotsEnter.append('text')
     .attr('y', -10)
     .text(function(d) {
         return d.Country;
-    });
+    });*/
 }
