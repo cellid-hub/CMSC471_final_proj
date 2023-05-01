@@ -5,7 +5,7 @@ var chartScales;
 var svg = d3.select('svg');
 var domainMap;
 var baselineCountry;
-var countries;
+var country_data;
 var chartScales;
 var chartG = svg.append('g')
     .attr('transform', 'translate('+[100, 100]+')');
@@ -18,6 +18,7 @@ var yAxisG = chartG.append('g')
     .attr('transform', 'translate('+[-65, -130]+')');
 
 d3.csv('CLEANED_assignment_3_dataset.csv').then(function(countries) {
+    country_data = countries;
     //creating dropdown menus for X and Y axis
     data_cols = countries.columns    
     //removes 'Country Iso Code' and 'Country'
@@ -91,9 +92,10 @@ function updateChart() {
 
     xAxisG.transition().duration(450).call(d3.axisBottom(xScale));
     yAxisG.transition().duration(450).call(d3.axisLeft(yScale));
-    console.log(countries)
-    var dots = chartG.selectAll('.dot').data(countries);  
-    dots.selectAll('.dot').enter()
+    console.log(country_data);
+
+    var dots = chartG.selectAll('.dot').data(country_data);  
+    var dotsEnter = dots.enter()
         .append('g')
         .attr('class', 'dot')
         .attr('transform', function(d) {
@@ -110,18 +112,15 @@ function updateChart() {
         .attr('transform', function(d) {
             var tx = xScale(d[chartScales.x]);
             var ty = yScale(d[chartScales.y]);
-            return 'translate('+[tx, ty]+')';
+            return 'translate('+[tx-190, ty]+')';
+        })
+        .style("fill", function(d){
+            if( d["Country"] == baselineCountry){
+                return "red";
+            }
+            return "blue";
         });
-    
-    dots.merge(dotsEnter)
-    .transition()
-    .duration(750)
-    .style("fill", function(d){
-        if( d["Country"] == baselineCountry){
-            return "red";
-        }
-        return "blue";
-    });
+        
 
     //adding ISO code text to each country
     /*dotsEnter.append('text')
