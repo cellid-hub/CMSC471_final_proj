@@ -8,11 +8,15 @@
 <body>
 	<div style="position: absolute; left: 0px; top: 250px;" >		
 			<label for="categorySelect">Y Scale:</label>		
-			<select class="custom-select small" id="yScaleSelect" onchange="onYScaleChanged()"></select>				
+			<select class="axis_select" id="yScaleSelect" onchange="onYScaleChanged()"></select>				
 	</div>
 	<div style="position: absolute; left: 475px; bottom: 125px;">		
 		<label for="categorySelect">X Scale:</label>		
-		<select class="custom-select small" id="yScaleSelect" onchange="onXScaleChanged()"></select>
+		<select class="axis_select" id="xScaleSelect" onchange="onXScaleChanged()"></select>
+	</div>
+	<div style="position: absolute; left: 0px; bottom: 125px;">		
+		<label for="categorySelect">Baseline Country:</label>		
+		<select class="countrySelect" id="countrySelect" onchange="onBaselineChange()"></select>
 	</div>
 	<div style="margin-left: 425px;">
 		<svg width="500" height="500" style="border: 1px solid #777;">
