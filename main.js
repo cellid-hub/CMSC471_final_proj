@@ -1,4 +1,5 @@
 //python -m http.server 8080
+//hope to create a 3d plot eventually: https://www.npmjs.com/package/d3-3d3
 var select = d3.selectAll('select');
 var chartScales;
 var svg = d3.select('svg');
