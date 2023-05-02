@@ -5,6 +5,7 @@ var svg = d3.select('svg');
 var domainMap;
 var baselineCountry;
 var country_data;
+var filtered_country;
 //creating scales
 var svgWidth = +svg.attr('width');
 var svgHeight = +svg.attr('height');
@@ -92,6 +93,7 @@ function onBaselineChange() {
     baselineCountry = select.options[select.selectedIndex].value
     // Update chart
     updateChart();
+	//updateBaseline();
 }
 
 function updateChart() {
@@ -102,16 +104,12 @@ function updateChart() {
     xAxisG.transition().duration(450).call(d3.axisBottom(xScale));
     yAxisG.transition().duration(450).call(d3.axisLeft(yScale));    
 
-	filtered_country_data_x = country_data.filter(function(item)
+	filtered_country_data = country_data.filter(function(item)
 		{
 			return item[chartScales.x] != '';
 		});
-	filtered_country_data_y = country_data.filter(function(item)
-	{
-		return item[chartScales.y] != '';
-	});
 
-    var dots = chartG.selectAll('.dot').data(filtered_country_data_x);  
+    var dots = chartG.selectAll('.dot').data(filtered_country_data);  
     var dotsEnter = dots.enter()
         .append('g')
         .attr('class', 'dot')
@@ -131,12 +129,11 @@ function updateChart() {
             var ty = yScale(d[chartScales.y]);
             return 'translate('+[tx, ty]+')';
         })
-        .style("fill", function(d){
-            if( d["Country"] != baselineCountry){				
-                return "red";
-            }
-            return "blue";
+		.attr('fill', function(d) {  
+			if(d['Country'] == baselineCountry){ return "red"; }
+            return 'blue';
         });
+	
         
     //adding ISO code text to each country
     dotsEnter.append('text')
@@ -145,4 +142,5 @@ function updateChart() {
         return d['ISO Country code'];
     });
 	dots.exit().remove();
+	dotsEnter.exit().remove();
 }
