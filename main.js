@@ -1,24 +1,31 @@
 //python -m http.server 8080
 //hope to create a 3d plot eventually: https://www.npmjs.com/package/d3-3d3
-//var select = d3.selectAll('select');
 var chartScales;
 var svg = d3.select('svg');
 var domainMap;
 var baselineCountry;
 var country_data;
-var chartScales;
+//creating scales
+var svgWidth = +svg.attr('width');
+var svgHeight = +svg.attr('height');
+var padding = {t: 20, r: 20, b: 20, l: 20};
+// Compute chart dimensions
+var chartWidth = svgWidth - padding.l - padding.r;
+var chartHeight = svgHeight - padding.t - padding.b;
+
 var chartG = svg.append('g')
-    .attr('transform', 'translate('+[100, 100]+')');
+    .attr('transform', 'translate('+[0, 0]+')');
 
 var xAxisG = chartG.append('g')
     .attr('class', 'x axis')
-    .attr('transform', 'translate('+[-65, 375]+')');
+    .attr('transform', 'translate('+[50, chartHeight]+')');
 var yAxisG = chartG.append('g')
     .attr('class', 'y axis')
-    .attr('transform', 'translate('+[-65, -130]+')');
+    .attr('transform', 'translate('+[padding.l, -20 ]+')');
 
 d3.csv('CLEANED_assignment_3_dataset.csv').then(function(countries) {
     country_data = countries;
+    //country_data[]
     //creating dropdown menus for X and Y axis
     data_cols = countries.columns    
     //removes 'Country Iso Code' and 'Country'
@@ -40,13 +47,10 @@ d3.csv('CLEANED_assignment_3_dataset.csv').then(function(countries) {
     d3.select('select.countrySelect').selectAll("option").data(country_names).enter().append("option").each(
         function(d){                 
                 d3.select(this).text(d).attr('value',d);
-        }); 
-    //creating scales
-    var svgWidth = +svg.attr('width');
-    var svgHeight = +svg.attr('height');
+        });     
     //scaling the axies to the scale of the svg chart    
-    xScale = d3.scaleLinear().range([0, svgWidth]);
-    yScale = d3.scaleLinear().range([svgHeight, 0]);
+    xScale = d3.scaleLinear().range([0, chartWidth]);
+    yScale = d3.scaleLinear().range([chartHeight, 0]);
     //finding the mininum and maximum value for each column (the diff car metrics)
     domainMap = {};
     data_cols.forEach(function(column) {
@@ -54,6 +58,7 @@ d3.csv('CLEANED_assignment_3_dataset.csv').then(function(countries) {
             return data_element[column];
         });
     });
+    console.log(domainMap);
     // Create global object called chartScales to keep state
     chartScales = {x: 'Year', y: 'Year'};
     updateChart();
@@ -91,8 +96,7 @@ function updateChart() {
     xScale.domain(domainMap[chartScales.x]).nice();
 
     xAxisG.transition().duration(450).call(d3.axisBottom(xScale));
-    yAxisG.transition().duration(450).call(d3.axisLeft(yScale));
-    console.log(country_data);
+    yAxisG.transition().duration(450).call(d3.axisLeft(yScale));    
 
     var dots = chartG.selectAll('.dot').data(country_data);  
     var dotsEnter = dots.enter()
@@ -104,8 +108,9 @@ function updateChart() {
             return 'translate('+[tx-190, ty]+')';
         });
     
-    dotsEnter.append('circle').attr('r', 3);
+    dotsEnter.append('circle').attr('r',3);    
 
+    
     dots.merge(dotsEnter)
         .transition()
         .duration(750)
@@ -121,11 +126,10 @@ function updateChart() {
             return "blue";
         });
         
-
     //adding ISO code text to each country
-    /*dotsEnter.append('text')
+    dotsEnter.append('text')
     .attr('y', -10)
     .text(function(d) {
         return d['ISO Country code'];
-    });*/
+    });
 }
