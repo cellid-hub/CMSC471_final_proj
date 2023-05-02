@@ -49,19 +49,23 @@ d3.csv('CLEANED_assignment_3_dataset.csv').then(function(countries) {
                 d3.select(this).text(d).attr('value',d);
         });     
     //scaling the axies to the scale of the svg chart    
-    xScale = d3.scaleLinear().range([0, chartWidth]);
-    yScale = d3.scaleLinear().range([chartHeight, 0]);
+    xScale = d3.scaleLinear().range([5, svgWidth]);
+    yScale = d3.scaleLinear().range([svgHeight, 5]);
     //finding the mininum and maximum value for each column (the diff car metrics)
     domainMap = {};
     data_cols.forEach(function(column) {
-        domainMap[column] = d3.extent(countries, function(data_element){
+		filtered_data = country_data.filter(function(item)
+		{
+			return item[column] != '';
+		});
+        domainMap[column] = d3.extent(filtered_data, function(data_element){
             return data_element[column];
         });
     });
     console.log(domainMap);
     // Create global object called chartScales to keep state
     chartScales = {x: 'Year', y: 'Year'};
-    updateChart();
+    updateChart();	
     })
 
 
@@ -98,29 +102,37 @@ function updateChart() {
     xAxisG.transition().duration(450).call(d3.axisBottom(xScale));
     yAxisG.transition().duration(450).call(d3.axisLeft(yScale));    
 
-    var dots = chartG.selectAll('.dot').data(country_data);  
+	filtered_country_data_x = country_data.filter(function(item)
+		{
+			return item[chartScales.x] != '';
+		});
+	filtered_country_data_y = country_data.filter(function(item)
+	{
+		return item[chartScales.y] != '';
+	});
+
+    var dots = chartG.selectAll('.dot').data(filtered_country_data_x);  
     var dotsEnter = dots.enter()
         .append('g')
         .attr('class', 'dot')
         .attr('transform', function(d) {
             var tx = xScale(d[chartScales.x]);
-            var ty = yScale(d[chartScales.y]);
-            return 'translate('+[tx-190, ty]+')';
+            var ty = yScale(d[chartScales.y]);						
+            return 'translate('+[tx, ty]+')';
         });
     
     dotsEnter.append('circle').attr('r',3);    
 
-    
     dots.merge(dotsEnter)
         .transition()
         .duration(750)
         .attr('transform', function(d) {
             var tx = xScale(d[chartScales.x]);
             var ty = yScale(d[chartScales.y]);
-            return 'translate('+[tx-190, ty]+')';
+            return 'translate('+[tx, ty]+')';
         })
         .style("fill", function(d){
-            if( d["Country"] == baselineCountry){
+            if( d["Country"] != baselineCountry){				
                 return "red";
             }
             return "blue";
@@ -132,4 +144,5 @@ function updateChart() {
     .text(function(d) {
         return d['ISO Country code'];
     });
+	dots.exit().remove();
 }
