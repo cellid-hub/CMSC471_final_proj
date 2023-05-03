@@ -126,7 +126,12 @@ function updateBaseline(){
 		.attr("r", function(d){
 				if(d['Country'] == baselineCountry){ return 6; }
 				return 3;
-		});
+		}).style("opacity", function(d) {
+		if(d['Country'] == baselineCountry){
+			return 1;
+		}
+		return .25;
+		});	;
 	
 }
 
