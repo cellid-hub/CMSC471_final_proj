@@ -1,30 +1,40 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>471 Final Project: Country Analysis</title>
-    <link rel="stylesheet" href="./style.css">
-</head>
-<body>
-	<div style="position: absolute; left: 0px; top: 250px;" >		
-			<label for="categorySelect">Y Scale:</label>		
-			<select class="axis_select" id="yScaleSelect" onchange="onYScaleChanged()"></select>				
-	</div>
-	<div style="position: absolute; left: 0px; top: 300px;">		
-		<label for="categorySelect">X Scale:</label>		
-		<select class="axis_select" id="xScaleSelect" onchange="onXScaleChanged()"></select>
-	</div>
-	<div style="position: absolute; left: 0px; top: 350px;">		
-		<label for="categorySelect">Baseline Country:</label>		
-		<select class="country_select" id="countrySelect" onchange="onBaselineChange()"></select>
-	</div>
-	<div style="margin-left: 425px;">
-		<svg width="1000" height="1000" style="border: 1px solid #777;">
-		</svg>
-	</div>
-    
-</body>
-<script src="//d3js.org/d3.v5.min.js"></script>
-<script src="./d3-tip.js"></script>
-<script src="./main.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div style="position: absolute; left: 0px; top: 250px">
+      <label for="categorySelect">Y Scale:</label>
+      <select
+        class="axis_select"
+        id="yScaleSelect"
+        onchange="onYScaleChanged()"
+      ></select>
+    </div>
+    <div style="position: absolute; left: 0px; top: 300px">
+      <label for="categorySelect">X Scale:</label>
+      <select
+        class="axis_select"
+        id="xScaleSelect"
+        onchange="onXScaleChanged()"
+      ></select>
+    </div>
+    <div style="position: absolute; left: 0px; top: 350px">
+      <label for="categorySelect">Baseline Country:</label>
+      <select
+        class="country_select"
+        id="countrySelect"
+        onchange="onBaselineChange()"
+      ></select>
+    </div>
+    <div style="margin-left: 425px">
+      <svg width="1000" height="1000" style="border: 1px solid #777"></svg>
+    </div>
+  </body>
+  <script src="//d3js.org/d3.v5.min.js"></script>
+  <script src="./d3-tip.js"></script>
+  <script src="./main.js"></script>
 </html>
