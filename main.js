@@ -26,45 +26,9 @@ var yAxisG = chartG.append('g')
 
 d3.csv('CLEANED_assignment_3_dataset.csv').then(function(countries) {
     country_data = countries;
-    //creating dropdown menus for X and Y axis
-    data_cols = countries.columns    
-    //removes 'Country Iso Code' and 'Country'
-    data_cols = data_cols.filter(function (data_col) {
-        return data_col !== 'ISO Country code' && data_col !== 'Country'; });
-    //generates column labels for x/y axis
-    d3.selectAll('select.axis_select').selectAll("option").data(data_cols).enter().append("option").each(
-        function(d){                 
-                d3.select(this).text(d).attr('value',d);
-        });       
-    //creating list of country names
-    var country_names = [];
-    function onlyUnique(value, index, array) {
-        return array.indexOf(value) === index;
-    }
-    countries.forEach(function(row){ country_names.push(row['Country']);});
-    country_names = country_names.filter(onlyUnique);
-    //adding country names to select list
-    d3.select('select.country_select').selectAll("option").data(country_names).enter().append("option").each(
-        function(d){                 
-                d3.select(this).text(d).attr('value',d);
-        });     
-    //scaling the axies to the scale of the svg chart    
-    xScale = d3.scaleLinear().range([5, svgWidth]);
-    yScale = d3.scaleLinear().range([svgHeight, 5]);
-    //finding the mininum and maximum value for each column (the diff car metrics)
-    domainMap = {};
-    data_cols.forEach(function(column) {
-		filtered_data = country_data.filter(function(item)
-		{
-			return item[column] != '';
-		});
-        domainMap[column] = d3.extent(filtered_data, function(data_element){
-            return data_element[column];
-        });
-    });    
-    // Create global object called chartScales to keep state
-    chartScales = {x: 'Year', y: 'Year'};
+	initializeScatterPlot();
     updateChart();	
+	updateBaseline();
     })
 
 
@@ -101,8 +65,7 @@ function updateChart() {
     xAxisG.transition().duration(450).call(d3.axisBottom(xScale));
     yAxisG.transition().duration(450).call(d3.axisLeft(yScale));    
 
-	filtered_country_data = country_data.filter(function(item)
-		{
+	filtered_country_data = country_data.filter(function(item){
 			return item[chartScales.x] != '';
 		});
 
@@ -125,7 +88,7 @@ function updateChart() {
             var tx = xScale(d[chartScales.x]);
             var ty = yScale(d[chartScales.y]);
             return 'translate('+[tx, ty]+')';
-        });		
+        });				
         
 	//adding hovering tooltip w/ ISO code
 	var tip = d3.tip()
@@ -142,15 +105,15 @@ function updateChart() {
 		.on('mouseout', tip.hide)
 	
 	dots.exit().remove();
-	dotsEnter.exit().remove();
+	dotsEnter.exit().remove();	
 	updateBaseline();
 }
 
 function updateBaseline(){
-	d3.selectAll('circle')
+	d3.selectAll('circle').data(filtered_country_data)
 		.join('circle')
 		.transition()
-        .duration(750)
+        .duration(750)		
 		.attr("fill", function(d){
 				if(d['Country'] == baselineCountry){ return "red"; }
 				return "blue";
@@ -160,4 +123,45 @@ function updateBaseline(){
 				return 3;
 		});
 	
+}
+
+function initializeScatterPlot(){
+	//creating dropdown menus for X and Y axis
+    data_cols = country_data.columns    
+    //removes 'Country Iso Code' and 'Country'
+    data_cols = data_cols.filter(function (data_col) {
+        return data_col !== 'ISO Country code' && data_col !== 'Country'; });
+    //generates column labels for x/y axis
+    d3.selectAll('select.axis_select').selectAll("option").data(data_cols).enter().append("option").each(
+        function(d){                 
+                d3.select(this).text(d).attr('value',d);
+        });       
+    //creating list of country names
+    var country_names = [];
+    function onlyUnique(value, index, array) {
+        return array.indexOf(value) === index;
+    }
+    country_data.forEach(function(row){ country_names.push(row['Country']);});
+    country_names = country_names.filter(onlyUnique);
+    //adding country names to select list
+    d3.select('select.country_select').selectAll("option").data(country_names).enter().append("option").each(
+        function(d){                 
+                d3.select(this).text(d).attr('value',d);
+        });     
+    //scaling the axies to the scale of the svg chart    
+    xScale = d3.scaleLinear().range([5, svgWidth]);
+    yScale = d3.scaleLinear().range([svgHeight, 5]);
+    //finding the mininum and maximum value for each column (the diff car metrics)
+    domainMap = {};
+    data_cols.forEach(function(column) {
+		filtered_data = country_data.filter(function(item)
+		{
+			return item[column] != '';
+		});
+        domainMap[column] = d3.extent(filtered_data, function(data_element){
+            return data_element[column];
+        });
+    });    
+    // Create global object called chartScales to keep state
+    chartScales = {x: 'Year', y: 'Year'};	
 }
