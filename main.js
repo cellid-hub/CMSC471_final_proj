@@ -79,7 +79,12 @@ function updateChart() {
             return 'translate('+[tx, ty]+')';
         });
     
-    dotsEnter.append('circle');			
+    dotsEnter.append('circle').style("opacity", function(d) {
+		if(d['Country'] == baselineCountry){
+			return 1;
+		}
+		return .25;
+		});			
 
     dots.merge(dotsEnter)
         .transition()
@@ -95,7 +100,7 @@ function updateChart() {
 		.attr('class', 'd3-tip')
 		.offset([-10, 0])
 		.html(function(d) {
-			return "<strong>" + d['ISO Country code'] + "</strong>";
+			return "<strong>" + d['ISO Country code']+", "+ d["Year"] + "</strong>";
 		})
 		
 	svg.call(tip);
