@@ -6,6 +6,8 @@ var domainMap;
 var baselineCountry = 'Afghanistan';
 var country_data;
 var filtered_country;
+var correlations;
+var data_cols;
 //creating scales
 var svgWidth = +svg.attr('width');
 var svgHeight = +svg.attr('height');
@@ -31,6 +33,11 @@ d3.csv('CLEANED_assignment_3_dataset.csv').then(function(countries) {
 	updateBaseline();
     })
 
+d3.csv('category_correlations.csv').then(function(d){
+	correlations = d;
+	update_coefficient();
+	})
+
 
 // Global functions called when select elements changed
 function onXScaleChanged() {
@@ -39,6 +46,7 @@ function onXScaleChanged() {
     chartScales.x = select.options[select.selectedIndex].value
     // Update chart
     updateChart();
+	update_coefficient();
 }
 
 function onYScaleChanged() {
@@ -47,6 +55,7 @@ function onYScaleChanged() {
     chartScales.y = select.options[select.selectedIndex].value
     // Update chart
     updateChart();
+	update_coefficient();
 }
 
 function onBaselineChange() {
@@ -101,13 +110,13 @@ function updateChart() {
 		.offset([-10, 0])
 		.html(function(d) {
 			return "<strong>" + d['ISO Country code']+", "+ d["Year"] + "</strong>";
-		})
+		});
 		
 	svg.call(tip);
 	
 	dotsEnter
 		.on('mouseover', tip.show)
-		.on('mouseout', tip.hide)
+		.on('mouseout', tip.hide);
 	
 	dots.exit().remove();
 	dotsEnter.exit().remove();	
@@ -174,4 +183,19 @@ function initializeScatterPlot(){
     });    
     // Create global object called chartScales to keep state
     chartScales = {x: 'Year', y: 'Year'};	
+}
+
+function update_coefficient(){
+	if (chartScales.x != 'Year' && chartScales.y != 'Year'){		
+		ind = data_cols.indexOf(chartScales.x) - 1;
+		console.log(correlations[ind][chartScales.y]);
+		corr_coeff = correlations[ind][chartScales.y];
+		d3.select("body").append('div')
+		.html("The correlation coefficient between <strong>"+chartScales.x+
+			"</strong> and <strong>"+chartScales.y+"</strong> is "+corr_coeff)
+		.attr("class","correlation")
+		.attr("x",100)
+		.attr("y",100)
+		;		
+	}
 }
