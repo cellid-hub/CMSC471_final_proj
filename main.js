@@ -3,7 +3,7 @@
 var chartScales;
 var svg = d3.select('svg');
 var domainMap;
-var baselineCountry;
+var baselineCountry = 'Afghanistan';
 var country_data;
 var filtered_country;
 //creating scales
@@ -26,7 +26,6 @@ var yAxisG = chartG.append('g')
 
 d3.csv('CLEANED_assignment_3_dataset.csv').then(function(countries) {
     country_data = countries;
-    //country_data[]
     //creating dropdown menus for X and Y axis
     data_cols = countries.columns    
     //removes 'Country Iso Code' and 'Country'
@@ -45,7 +44,7 @@ d3.csv('CLEANED_assignment_3_dataset.csv').then(function(countries) {
     countries.forEach(function(row){ country_names.push(row['Country']);});
     country_names = country_names.filter(onlyUnique);
     //adding country names to select list
-    d3.select('select.countrySelect').selectAll("option").data(country_names).enter().append("option").each(
+    d3.select('select.country_select').selectAll("option").data(country_names).enter().append("option").each(
         function(d){                 
                 d3.select(this).text(d).attr('value',d);
         });     
@@ -62,8 +61,7 @@ d3.csv('CLEANED_assignment_3_dataset.csv').then(function(countries) {
         domainMap[column] = d3.extent(filtered_data, function(data_element){
             return data_element[column];
         });
-    });
-    console.log(domainMap);
+    });    
     // Create global object called chartScales to keep state
     chartScales = {x: 'Year', y: 'Year'};
     updateChart();	
@@ -91,9 +89,8 @@ function onBaselineChange() {
     var select = d3.select('#countrySelect').node();
     // Get current value of select element, save to global chartScales
     baselineCountry = select.options[select.selectedIndex].value
-    // Update chart
-    updateChart();
-	//updateBaseline();
+    // Update chart    
+	updateBaseline();
 }
 
 function updateChart() {
@@ -119,7 +116,7 @@ function updateChart() {
             return 'translate('+[tx, ty]+')';
         });
     
-    dotsEnter.append('circle').attr('r',3);    
+    dotsEnter.append('circle');			
 
     dots.merge(dotsEnter)
         .transition()
@@ -128,12 +125,7 @@ function updateChart() {
             var tx = xScale(d[chartScales.x]);
             var ty = yScale(d[chartScales.y]);
             return 'translate('+[tx, ty]+')';
-        })
-		.attr('fill', function(d) {  
-			if(d['Country'] == baselineCountry){ return "red"; }
-            return 'blue';
-        });
-	
+        });		
         
     //adding ISO code text to each country
     dotsEnter.append('text')
@@ -143,4 +135,21 @@ function updateChart() {
     });
 	dots.exit().remove();
 	dotsEnter.exit().remove();
+	updateBaseline();
+}
+
+function updateBaseline(){
+	d3.selectAll('circle')
+		.join('circle')
+		.transition()
+        .duration(750)
+		.attr("fill", function(d){
+				if(d['Country'] == baselineCountry){ return "red"; }
+				return "blue";
+		})
+		.attr("r", function(d){
+				if(d['Country'] == baselineCountry){ return 6; }
+				return 3;
+		});
+	
 }
