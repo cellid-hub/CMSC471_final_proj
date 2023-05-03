@@ -127,12 +127,20 @@ function updateChart() {
             return 'translate('+[tx, ty]+')';
         });		
         
-    //adding ISO code text to each country
-    dotsEnter.append('text')
-    .attr('y', -10)
-    .text(function(d) {
-        return d['ISO Country code'];
-    });
+	//adding hovering tooltip w/ ISO code
+	var tip = d3.tip()
+		.attr('class', 'd3-tip')
+		.offset([-10, 0])
+		.html(function(d) {
+			return "<strong>" + d['ISO Country code'] + "</strong>";
+		})
+		
+	svg.call(tip);
+	
+	dotsEnter
+		.on('mouseover', tip.show)
+		.on('mouseout', tip.hide)
+	
 	dots.exit().remove();
 	dotsEnter.exit().remove();
 	updateBaseline();
