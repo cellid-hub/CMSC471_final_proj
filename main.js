@@ -1,5 +1,7 @@
 //python -m http.server 8080
 //hope to create a 3d plot eventually: https://www.npmjs.com/package/d3-3d3
+var xAxisType = 0;
+var yAxisType = 0;
 var chartScales;
 var svg = d3.select('svg');
 var domainMap;
@@ -65,6 +67,15 @@ function onBaselineChange() {
     // Update chart    
 	updateBaseline();
 }
+
+function onAxisType() {
+
+}
+
+
+
+
+
 
 function updateChart() {
     // Update the scales based on new data attributes      
@@ -202,4 +213,38 @@ function update_coefficient(){
 		.attr("y",100)
 		;		
 	}
+}
+
+function update_Xaxis() {
+    if (xAxisType == 0) {
+        xScale = d3.scaleLog().range([50, svgWidth - 50]);
+        xAxisType = 1;
+        updateChart();
+    } else {
+        xScale = d3.scaleLinear().range([50, svgWidth - 50]);
+        xAxisType = 0;
+        updateChart()
+    }
+}
+function update_Yaxis() {
+    if (yAxisType == 0) {
+        yScale = d3.scaleLog().range([50, svgWidth - 50]);
+        yAxisType = 1;
+        updateChart();
+    } else {
+        yScale = d3.scaleLinear().range([50, svgWidth - 50]);
+        yAxisType = 0;
+        updateChart()
+    }
+}
+function update_Yaxis() {
+    if (yAxisType == 0) {
+        yScale = d3.scaleLog().range([50, svgWidth - 50]);
+        yAxisType = 1;
+        updateChart();
+    } else {
+        yScale = d3.scaleLinear().range([50, svgWidth - 50]);
+        yAxisType = 0;
+        updateChart()
+    }
 }
