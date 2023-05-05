@@ -11,7 +11,7 @@ var data_cols;
 //creating scales
 var svgWidth = +svg.attr('width');
 var svgHeight = +svg.attr('height');
-var padding = {t: 20, r: 20, b: 20, l: 20};
+var padding = {t: 50, r: 50, b: 50, l: 50};
 // Compute chart dimensions
 var chartWidth = svgWidth - padding.l - padding.r;
 var chartHeight = svgHeight - padding.t - padding.b;
@@ -21,10 +21,10 @@ var chartG = svg.append('g')
 
 var xAxisG = chartG.append('g')
     .attr('class', 'x axis')
-    .attr('transform', 'translate('+[50, chartHeight]+')');
+    .attr('transform', 'translate('+[0, chartHeight + 60]+')');
 var yAxisG = chartG.append('g')
     .attr('class', 'y axis')
-    .attr('transform', 'translate('+[padding.l, -20 ]+')');
+    .attr('transform', 'translate('+[40, 0 ]+')');
 
 d3.csv('CLEANED_assignment_3_dataset.csv').then(function(countries) {
     country_data = countries;
@@ -168,18 +168,22 @@ function initializeScatterPlot(){
                 d3.select(this).text(d).attr('value',d);
         });     
     //scaling the axies to the scale of the svg chart    
-    xScale = d3.scaleLinear().range([5, svgWidth]);
-    yScale = d3.scaleLinear().range([svgHeight, 5]);
+    xScale = d3.scaleLinear().range([50, svgWidth - 50]);
+    yScale = d3.scaleLinear().range([svgHeight - 50, 50]);
     //finding the mininum and maximum value for each column (the diff car metrics)
     domainMap = {};
+
     data_cols.forEach(function(column) {
 		filtered_data = country_data.filter(function(item)
 		{
 			return item[column] != '';
 		});
         domainMap[column] = d3.extent(filtered_data, function(data_element){
-            return data_element[column];
+            return +data_element[column];
         });
+
+        console.log(domainMap)
+       
     });    
     // Create global object called chartScales to keep state
     chartScales = {x: 'Year', y: 'Year'};	
