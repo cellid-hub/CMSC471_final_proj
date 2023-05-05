@@ -228,22 +228,11 @@ function update_Xaxis() {
 }
 function update_Yaxis() {
     if (yAxisType == 0) {
-        yScale = d3.scaleLog().range([50, svgWidth - 50]);
+        yScale = d3.scaleLog().range([svgHeight - 50, 50]);;
         yAxisType = 1;
         updateChart();
     } else {
-        yScale = d3.scaleLinear().range([50, svgWidth - 50]);
-        yAxisType = 0;
-        updateChart()
-    }
-}
-function update_Yaxis() {
-    if (yAxisType == 0) {
-        yScale = d3.scaleLog().range([50, svgWidth - 50]);
-        yAxisType = 1;
-        updateChart();
-    } else {
-        yScale = d3.scaleLinear().range([50, svgWidth - 50]);
+        yScale = d3.scaleLinear().range([svgHeight - 50, 50]);;
         yAxisType = 0;
         updateChart()
     }
