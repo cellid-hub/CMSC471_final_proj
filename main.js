@@ -150,10 +150,10 @@ function initializeScatterPlot(){
     data_cols = data_cols.filter(function (data_col) {
         return data_col !== 'ISO Country code' && data_col !== 'Country'; });
     //generates column labels for x/y axis
-    d3.selectAll('select.axis_select').selectAll("option").data(data_cols).enter().append("option").each(
+    /*d3.selectAll('select.axis_select').selectAll("option").data(data_cols).enter().append("option").each(
         function(d){                 
                 d3.select(this).text(d).attr('value',d);
-        });       
+        });     */ 
     //creating list of country names
     var country_names = [];
     function onlyUnique(value, index, array) {
