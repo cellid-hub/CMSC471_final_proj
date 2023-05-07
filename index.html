@@ -6,19 +6,19 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-	<div style="position: absolute; left: 30px; top: 350px;" >		
+	<div style="position: absolute; left: 30px; top: 100px;" >		
 			<label for="categorySelect">Y Scale:</label>		
 			<select class="axis_select" id="yScaleSelect" onchange="onYScaleChanged()"></select>				
 	</div>
-	<div style="position: absolute; left: 30px; top: 300px;">		
+	<div style="position: absolute; left: 30px; top: 150px;">		
 		<label for="categorySelect">X Scale:</label>		
 		<select class="axis_select" id="xScaleSelect" onchange="onXScaleChanged()"></select>
 	</div>
-	<div style="position: absolute; left: 15px; top: 250px;">		
+	<div style="position: absolute; left: 15px; top: 200px;">		
 		<label for="categorySelect">Baseline Country:</label>		
 		<select class="country_select" id="countrySelect" onchange="onBaselineChange()"></select>
 	</div>
-	<div class="btn-group btn-group-sm" data-toggle="buttons" style="position: absolute; left: 50px; top: 400px;">
+	<div class="btn-group btn-group-sm" data-toggle="buttons" style="position: absolute; left: 50px; top: 250px;">
 		<label class="btn btn-secondary" data-type="nodes_links">
 			<input type="checkbox" name="options" autocomplete="off" onchange="update_Xaxis()">Log X scale
 		</label>
@@ -31,7 +31,7 @@
 		<svg width="1000" height="1000" style="border: 1px solid #777;">
 		</svg>
 	</div>
-    
+    <div style="position: absolute; left: -15px; top : 300px;" id="my_dataviz" class = "parallel_coords" ></div> 
 </body>
 <script src="//d3js.org/d3.v5.min.js"></script>
 <script src="./d3-tip.js"></script>
