@@ -18,12 +18,20 @@
 		<label for="categorySelect">Baseline Country:</label>		
 		<select class="country_select" id="countrySelect" onchange="onBaselineChange()"></select>
 	</div>
-	<div class="btn-group btn-group-sm" data-toggle="buttons" style="position: absolute; left: 50px; top: 250px;">
+	<div class="btn-group btn-group-sm" data-toggle="buttons" style="position: absolute; left: 50px; top: 230px;">
 		<label class="btn btn-secondary" data-type="nodes_links">
 			<input type="checkbox" name="options" autocomplete="off" onchange="update_Xaxis()">Log X scale
 		</label>
 		<label class="btn btn-secondary"  data-type="states">
 			<input type="checkbox" name="options" autocomplete="off"onchange="update_Yaxis()">Log Y scale
+		</label>
+	</div>
+	<div class="btn-group btn-group-sm" data-toggle="buttons" style="position: absolute; left: 50px; top: 260px;">
+		<label class="btn btn-secondary" data-type="nodes_links">
+			<input type="checkbox" name="options" autocomplete="off" onchange="updateColorYear()">Color by Year
+		</label>
+		<label class="btn btn-secondary"  data-type="states">
+			<input type="checkbox" name="options" autocomplete="off">Color by Region
 		</label>
 	</div>
 	<div id="main">

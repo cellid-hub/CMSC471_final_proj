@@ -2,6 +2,7 @@
 //hope to create a 3d plot eventually: https://www.npmjs.com/package/d3-3d3
 var xAxisType = 0;
 var yAxisType = 0;
+var year_color = 0;
 var chartScales;
 var svg = d3.select('svg');
 var domainMap;
@@ -139,6 +140,26 @@ function updateBaseline(){
 		}
 		return .25;
 		}).style("fill", function(d){
+            return "black";
+		});	
+	
+}
+
+function updateColorYear() {
+    if (year_color == 0) {
+        d3.selectAll('circle').data(filtered_country_data)
+        .join('circle')
+        .transition()
+        .duration(750)		
+        .attr("r", function(d){
+                if(d['Country'] == baselineCountry){ return 6; }
+                return 3;
+        }).style("opacity", function(d) {
+        if(d['Country'] == baselineCountry){
+            return 1;
+        }
+        return .25;
+        }).style("fill", function(d){
             if(+d['Year'] == 2014){ return "red"; }
             if(+d['Year'] == 2015){ return "pink"; }
             if(+d['Year'] == 2016){ return "orange"; }
@@ -148,8 +169,26 @@ function updateBaseline(){
             if(+d['Year'] == 2020){ return "indigo"; }
             if(+d['Year'] == 2021){ return "violet"; }
             return "black";
-		});	
-	
+        });	
+        year_color = 1;
+    } else {
+        year_color = 0;
+        d3.selectAll('circle').data(filtered_country_data)
+        .join('circle')
+        .transition()
+        .duration(750)		
+        .attr("r", function(d){
+                if(d['Country'] == baselineCountry){ return 6; }
+                return 3;
+        }).style("opacity", function(d) {
+        if(d['Country'] == baselineCountry){
+            return 1;
+        }
+        return .25;
+        }).style("fill", function(d){
+            return "black";
+        });	
+    }
 }
 
 function initializeScatterPlot(){
