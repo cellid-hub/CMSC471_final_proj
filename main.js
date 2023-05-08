@@ -68,15 +68,6 @@ function onBaselineChange() {
 	updateBaseline();
 }
 
-function onAxisType() {
-
-}
-
-
-
-
-
-
 function updateChart() {
     // Update the scales based on new data attributes      
     yScale.domain(domainMap[chartScales.y]).nice();
@@ -104,7 +95,7 @@ function updateChart() {
 			return 1;
 		}
 		return .25;
-		});			
+		})				
 
     dots.merge(dotsEnter)
         .transition()
@@ -139,10 +130,6 @@ function updateBaseline(){
 		.join('circle')
 		.transition()
         .duration(750)		
-		.attr("fill", function(d){
-				if(d['Country'] == baselineCountry){ return "red"; }
-				return "blue";
-		})
 		.attr("r", function(d){
 				if(d['Country'] == baselineCountry){ return 6; }
 				return 3;
@@ -151,7 +138,17 @@ function updateBaseline(){
 			return 1;
 		}
 		return .25;
-		});	;
+		}).style("fill", function(d){
+            if(+d['Year'] == 2014){ return "red"; }
+            if(+d['Year'] == 2015){ return "pink"; }
+            if(+d['Year'] == 2016){ return "orange"; }
+            if(+d['Year'] == 2017){ return "yellow"; }
+            if(+d['Year'] == 2018){ return "green"; }
+            if(+d['Year'] == 2019){ return "blue"; }
+            if(+d['Year'] == 2020){ return "indigo"; }
+            if(+d['Year'] == 2021){ return "violet"; }
+            return "black";
+		});	
 	
 }
 
@@ -193,7 +190,6 @@ function initializeScatterPlot(){
             return +data_element[column];
         });
 
-        console.log(domainMap)
        
     });    
     // Create global object called chartScales to keep state
@@ -203,7 +199,6 @@ function initializeScatterPlot(){
 function update_coefficient(){
 	if (chartScales.x != 'Year' && chartScales.y != 'Year'){		
 		ind = data_cols.indexOf(chartScales.x) - 1;
-		console.log(correlations[ind][chartScales.y]);
 		corr_coeff = correlations[ind][chartScales.y];
 		d3.select("body").append('div')
 		.html("The correlation coefficient between <strong>"+chartScales.x+
