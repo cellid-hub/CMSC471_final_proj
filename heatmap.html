@@ -1,76 +1,193 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
 
 <!-- Create a div where the graph will take place -->
 <div id="my_dataviz"></div>
 
-<!-- Load color palettes -->
+<!-- Style -->
+<style>
+  .xAxis line {
+    stroke: black;
+  }
+</style>
+
+<body>
+  <label for="column-select">Category</label>
+  <select id="column-select">
+    <option value="year">Year</option>
+    <option value="gdp">GDP ($ USD billions PPP)</option>
+    <option value="gdp-per-capita">GDP per capita in $ (PPP)</option>
+    <option value="iso-code">ISO Country code</option>
+    <option value="military-spending">Military Spending as % of GDP</option>
+    <option value="health-expenditure-gdp">Health Expenditure % of GDP</option>
+    <option value="health-expenditure-per-person">
+      Health Expenditure per person
+    </option>
+    <option value="unemployment">Unemployment (%)</option>
+  </select>
+</body>
+
+<!-- Viridis color palette-->
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
 <script>
-  var margin = { top: 50, right: 50, bottom: 100, left: 100 },
-    width = 800 - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom;
+  // set the dimensions and margins of the graph
+  var margin = { top: 80, right: 30, bottom: 50, left: 110 },
+    width = 500 - margin.left - margin.right,
+    height = 2000 - margin.top - margin.bottom;
 
-  // Append the svg object to the body of the page
+  // append the svg object to the body of the page
   var svg = d3
-    .select("body")
+    .select("#my_dataviz")
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  // Load the data from the CSV file
+  //read data
+
   d3.csv("CLEANED_assignment_3_dataset.csv", function (data) {
-    // Extract the columns we're interested in
-    var countries = data.map(function (d) {
-      return d.Country;
-    });
-    var years = data.map(function (d) {
-      return d.Year;
-    });
-    var values = data.map(function (d) {
-      return +d["GDP ($ USD billions PPP)"];
-    });
+    var years = Array.from(
+      new Set(
+        data.map(function (d) {
+          return d.Year;
+        })
+      )
+    );
 
-    // Define the color scale
-    var colorScale = d3
+    var countries = Array.from(
+      new Set(
+        data.map(function (d) {
+          return d.Country;
+        })
+      )
+    );
+
+    var n = countries.length;
+
+    var myColor = d3
       .scaleSequential()
-      .interpolator(d3.interpolateBlues)
-      .domain(d3.extent(values));
+      .domain([0, 100])
+      .interpolator(d3.interpolateViridis);
 
-    // Create the heatmap
-    var heatmap = svg
-      .selectAll()
-      .data(data)
-      .enter()
-      .append("rect")
-      .attr("x", function (d) {
-        return years.indexOf(d.Year) * (width / years.length);
-      })
-      .attr("y", function (d) {
-        return countries.indexOf(d.Country) * (height / countries.length);
-      })
-      .attr("width", width / years.length)
-      .attr("height", height / countries.length)
-      .style("fill", function (d) {
-        return colorScale(+d["GDP ($ USD billions PPP)"]);
-      });
+    // Define the x scale
+    var x = d3.scaleBand().domain(years).range([0, width]).padding(0.2);
+    // Define the y scale
+    var y = d3.scaleBand().domain(countries).range([0, height]).padding(0.4);
 
-    // Add the axes
-    var xScale = d3.scaleBand().range([0, width]).domain(years).padding(0.01);
-    var yScale = d3
-      .scaleBand()
-      .range([0, height])
-      .domain(countries)
-      .padding(0.01);
-    var xAxis = d3.axisBottom(xScale);
-    var yAxis = d3.axisLeft(yScale);
+    // Draw the x axis
     svg
       .append("g")
       .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-    svg.append("g").call(yAxis);
+      .call(d3.axisBottom(x));
+    // Draw the y axis
+    svg.append("g").call(d3.axisLeft(y));
+
+    // Add X axis label:
+    svg
+      .append("text")
+      .attr("text-anchor", "end")
+      .attr("x", width / 2)
+      .attr("y", height + 40)
+      .text("Year");
+
+    // Compute kernel density estimation for each column:
+    var kde = kernelDensityEstimator(kernelEpanechnikov(7), x); // increase this 40 for more accurate density.
+    var allDensity = [];
+    for (i = 0; i < n; i++) {
+      key = data.map(function (d) {
+        return d.Country;
+      });
+      density = kde(
+        data.map(function (d) {
+          return d.Value;
+        })
+      );
+      allDensity.push({ key: key, density: density });
+    }
+
+    // Add areas
+    svg
+      .selectAll("areas")
+      .data(allDensity)
+      .enter()
+      .append("path")
+      .attr("transform", function (d) {
+        return "translate(0," + (yName(d.key) - height) + ")";
+      })
+      .attr("fill", function (d) {
+        grp = d.key;
+        index = categories.indexOf(grp);
+        value = allMeans[index];
+        return myColor(value);
+      })
+      .datum(function (d) {
+        return d.density;
+      })
+      .attr("opacity", 0.7)
+      .attr("stroke", "#000")
+      .attr("stroke-width", 0.1)
+      .attr(
+        "d",
+        d3
+          .line()
+          .curve(d3.curveBasis)
+          .x(function (d) {
+            return x(d[0]);
+          })
+          .y(function (d) {
+            return y(d[1]);
+          })
+      );
   });
+
+  // This is what I need to compute kernel density estimation
+  function kernelDensityEstimator(kernel, X) {
+    return function (V) {
+      return X.map(function (x) {
+        return [
+          x,
+          d3.mean(V, function (v) {
+            return kernel(x - v);
+          }),
+        ];
+      });
+    };
+  }
+  function kernelEpanechnikov(k) {
+    return function (v) {
+      return Math.abs((v /= k)) <= 1 ? (0.75 * (1 - v * v)) / k : 0;
+    };
+  }
+
+  function normalizeData(data, year, column) {
+    // Get the minimum and maximum values of the specified column for the specified year
+    var extent = d3.extent(
+      data.filter(function (d) {
+        return d.Year == year;
+      }),
+      function (d) {
+        return +d[column];
+      }
+    );
+
+    // Normalize the data for the specified year and column
+    var normalizedData = data
+      .filter(function (d) {
+        return d.Year == year;
+      })
+      .map(function (d) {
+        return {
+          Country: d.Country,
+          Value: (+d[column] - extent[0]) / (extent[1] - extent[0]),
+          Year: year,
+        };
+      });
+
+    return normalizedData;
+  }
 </script>
