@@ -3,6 +3,7 @@
 
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
+<script src="./d3-tip.js"></script>
 
 <!-- Create a div where the graph will take place -->
 <div id="my_dataviz"></div>
@@ -17,7 +18,6 @@
 <body>
   <label for="column-select">Category</label>
   <select id="column-select">
-    <option value="year">Year</option>
     <option value="gdp">GDP ($ USD billions PPP)</option>
     <option value="gdp-per-capita">GDP per capita in $ (PPP)</option>
     <option value="iso-code">ISO Country code</option>
@@ -36,8 +36,8 @@
 <script>
   // set the dimensions and margins of the graph
   var margin = { top: 80, right: 30, bottom: 50, left: 110 },
-    width = 500 - margin.left - margin.right,
-    height = 2000 - margin.top - margin.bottom;
+    width = 450 - margin.left - margin.right,
+    height = 3000 - margin.top - margin.bottom;
 
   // append the svg object to the body of the page
   var svg = d3
@@ -49,6 +49,19 @@
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   //read data
+  var column = "Military Spending as % of GDP";
+
+  // Add event listener to the dropdown
+  d3.select("#column-select").on("change", function () {
+    // Retrieve the selected value
+    var selectedValue = d3.select(this).property("value");
+
+    // Update the column variable
+    column = selectedValue;
+
+    // Update the graph with the new column
+    updateGraph();
+  });
 
   d3.csv("CLEANED_assignment_3_dataset.csv", function (data) {
     var years = Array.from(
@@ -95,74 +108,56 @@
       .attr("y", height + 40)
       .text("Year");
 
-    // Compute kernel density estimation for each column:
-    var kde = kernelDensityEstimator(kernelEpanechnikov(7), x); // increase this 40 for more accurate density.
-    var allDensity = [];
-    for (i = 0; i < n; i++) {
-      key = data.map(function (d) {
-        return d.Country;
+    var country = "Haiti";
+    var column = "Military Spending as % of GDP";
+    var radius = d3.scaleLinear().domain([0, 1]).range([5, 20]);
+
+    // Normalize the data for the specified country and column for each year
+    var normalizedData = years.map(function (year) {
+      return normalizeData(data, year, column).find(function (d) {
+        return d.Country === country;
       });
-      density = kde(
-        data.map(function (d) {
-          return d.Value;
+    });
+
+    // Set up the initial opacity and transition duration for the areas
+    var initialOpacity = 0;
+    var transitionDuration = 1000;
+
+    // Iterate through every country
+    countries.forEach(function (country) {
+      // Normalize the data for the specified country and column for each year
+      var normalizedData = years.map(function (year) {
+        return normalizeData(data, year, column).find(function (d) {
+          return d.Country === country;
+        });
+      });
+
+      // Define the area function
+      var area = d3
+        .area()
+        .x(function (d) {
+          return x(d.Year);
         })
-      );
-      allDensity.push({ key: key, density: density });
-    }
+        .y0(function (d) {
+          return y(d.Country) + y.bandwidth() / 2;
+        })
+        .y1(function (d) {
+          return y(d.Country) + y.bandwidth() / 2 - radius(d.Value);
+        })
+        .curve(d3.curveMonotoneX);
 
-    // Add areas
-    svg
-      .selectAll("areas")
-      .data(allDensity)
-      .enter()
-      .append("path")
-      .attr("transform", function (d) {
-        return "translate(0," + (yName(d.key) - height) + ")";
-      })
-      .attr("fill", function (d) {
-        grp = d.key;
-        index = categories.indexOf(grp);
-        value = allMeans[index];
-        return myColor(value);
-      })
-      .datum(function (d) {
-        return d.density;
-      })
-      .attr("opacity", 0.7)
-      .attr("stroke", "#000")
-      .attr("stroke-width", 0.1)
-      .attr(
-        "d",
-        d3
-          .line()
-          .curve(d3.curveBasis)
-          .x(function (d) {
-            return x(d[0]);
-          })
-          .y(function (d) {
-            return y(d[1]);
-          })
-      );
+      // Draw the area using the normalized data points for the current country
+      svg
+        .append("path")
+        .datum(normalizedData)
+        .attr("fill", myColor(Math.random() * 100))
+        .attr("opacity", initialOpacity) // Set the initial opacity to 0
+        .attr("d", area)
+        .transition() // Add a transition to animate the drawing of the area
+        .duration(transitionDuration)
+        .attr("opacity", 1); // Set the final opacity to 1
+    });
   });
-
-  // This is what I need to compute kernel density estimation
-  function kernelDensityEstimator(kernel, X) {
-    return function (V) {
-      return X.map(function (x) {
-        return [
-          x,
-          d3.mean(V, function (v) {
-            return kernel(x - v);
-          }),
-        ];
-      });
-    };
-  }
-  function kernelEpanechnikov(k) {
-    return function (v) {
-      return Math.abs((v /= k)) <= 1 ? (0.75 * (1 - v * v)) / k : 0;
-    };
-  }
 
   function normalizeData(data, year, column) {
     // Get the minimum and maximum values of the specified column for the specified year
@@ -181,13 +176,21 @@
         return d.Year == year;
       })
       .map(function (d) {
+        var value = +d[column];
+
         return {
           Country: d.Country,
-          Value: (+d[column] - extent[0]) / (extent[1] - extent[0]),
+          Value: isNaN((value - extent[0]) / (extent[1] - extent[0]))
+            ? 0
+            : (value - extent[0]) / (extent[1] - extent[0]),
           Year: year,
         };
       });
 
     return normalizedData;
+  }
+  function updateGraph() {
+    // Retrieve the selected value
+    var selectedValue = d3.select("#column-select").property("value");
   }
 </script>

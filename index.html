@@ -1,5 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+  <div id="my_dataviz"></div>
+  <!-- Style -->
+  <style>
+    .xAxis line {
+      stroke: black;
+    }
+  </style>
   <head>
     <meta charset="UTF-8" />
     <title>471 Final Project: Country Analysis</title>
@@ -29,12 +36,17 @@
         id="countrySelect"
         onchange="onBaselineChange()"
       ></select>
+      <button onclick="window.location.href='areachart.html'">
+        Go to Area Chart
+      </button>
     </div>
     <div style="margin-left: 425px">
       <svg width="1000" height="1000" style="border: 1px solid #777"></svg>
     </div>
   </body>
   <script src="//d3js.org/d3.v5.min.js"></script>
+
   <script src="./d3-tip.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
   <script src="./main.js"></script>
 </html>
