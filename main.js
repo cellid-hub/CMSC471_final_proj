@@ -3,6 +3,7 @@
 var xAxisType = 0;
 var yAxisType = 0;
 var year_color = 0;
+var region_color = 0;
 var chartScales;
 var svg = d3.select('svg');
 var domainMap;
@@ -76,6 +77,7 @@ function updateChart() {
 
     xAxisG.transition().duration(450).call(d3.axisBottom(xScale));
     yAxisG.transition().duration(450).call(d3.axisLeft(yScale));    
+
 
 	filtered_country_data = country_data.filter(function(item){
 			return item[chartScales.x] != '';
@@ -173,6 +175,47 @@ function updateColorYear() {
         year_color = 1;
     } else {
         year_color = 0;
+        d3.selectAll('circle').data(filtered_country_data)
+        .join('circle')
+        .transition()
+        .duration(750)		
+        .attr("r", function(d){
+                if(d['Country'] == baselineCountry){ return 6; }
+                return 3;
+        }).style("opacity", function(d) {
+        if(d['Country'] == baselineCountry){
+            return 1;
+        }
+        return .25;
+        }).style("fill", function(d){
+            return "black";
+        });	
+    }
+}
+
+function updateRegionColor() {
+	var regionNames = ['North America', 'South America', 'Europe', 'Middle East', 'Asia & Pacific', 'Africa', 'Australia'];
+	var colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+		.domain(regionNames);
+	if(region_color == 0) {
+		d3.selectAll('circle').data(filtered_country_data)
+        .join('circle')
+        .transition()
+        .duration(750)		
+        .attr("r", function(d){
+                if(d['Country'] == baselineCountry){ return 6; }
+                return 3;
+        }).style("opacity", function(d) {
+        if(d['Country'] == baselineCountry){
+            return 1;
+        }
+        return .25;
+        }).style("fill", function(d){
+            return colorScale(d['Region']);
+        });	
+        region_color = 1;
+	} else {
+        region_color = 0;
         d3.selectAll('circle').data(filtered_country_data)
         .join('circle')
         .transition()
